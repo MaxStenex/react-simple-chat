@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import "../styles/Join.scss";
+import { useHistory } from "react-router-dom";
 
 const Join = () => {
   const [formValues, setFormValues] = useState({ roomName: "", nickName: "" });
   const [errorText, setErrorText] = useState("");
+  const history = useHistory();
 
   const onSubmit = (evt) => {
     evt.preventDefault();
@@ -11,6 +13,7 @@ const Join = () => {
       if (formValues.roomName.trim() === "" || formValues.nickName.trim() === "") {
         throw new Error("Please, fill room name and nick name fields");
       }
+      history.push(`/chat?room=${formValues.roomName}&user=${formValues.nickName}`);
     } catch (error) {
       return setErrorText(error.message);
     }
