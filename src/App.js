@@ -1,7 +1,17 @@
-import "./styles/App.scss";
+import { Switch, Route, Redirect } from "react-router-dom";
+import { Chat, Join } from "./components";
 
-function App() {
-  return <h1>Hello, world!</h1>;
-}
+import "./styles/App.scss";
+import "./styles/normalize.scss";
+
+const App = () => {
+  return (
+    <Switch>
+      <Route path="/join" component={Join} />
+      <Route path="/chat" component={Chat} />
+      <Route path="/" render={() => <Redirect to="/join" />} />
+    </Switch>
+  );
+};
 
 export default App;
