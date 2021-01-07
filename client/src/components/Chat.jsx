@@ -4,19 +4,22 @@ import "../styles/Chat.scss";
 import queryString from "query-string";
 import { io } from "socket.io-client";
 
-let socket;
-
 const Chat = () => {
   const location = useLocation();
   const { user: username, room } = queryString.parse(location.search);
 
   const [messageText, setMessageText] = useState("");
   useEffect(() => {
-    socket = io();
+    const socket = io("http://localhost:4000");
+
+    window.onbeforeunload = () => {
+      socket.emit("userLogout", { username, room });
+    };
 
     socket.emit("joinRoom", { username, room });
 
     return () => {
+      socket.emit("userLogout", { username, room });
       socket.disconnect();
     };
   }, [username, room]);
