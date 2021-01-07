@@ -1,19 +1,9 @@
 const rooms = new Map();
 
-// const room = {
-//   users: new Map(),
-//   messages: [
-//     {
-//       creator: "maxim",
-//       text: "blabla",
-//     },
-//   ],
-// };
-
 const createNewRoom = (roomName) => {
   const room = {
     users: [],
-    messages: [{}],
+    messages: [],
   };
   rooms.set(roomName, room);
 };
@@ -34,4 +24,11 @@ const deleteUserFromRoom = (userName, roomName) => {
   }
 };
 
-module.exports = { addUserInRoom, rooms, deleteUserFromRoom };
+const addNewMessageInRoom = (message, roomName) => {
+  const room = rooms.get(roomName);
+  if (room) {
+    room.messages.push(message);
+  }
+};
+
+module.exports = { addUserInRoom, rooms, deleteUserFromRoom, addNewMessageInRoom };

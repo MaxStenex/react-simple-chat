@@ -2,7 +2,12 @@ const express = require("express");
 const socketio = require("socket.io");
 const http = require("http");
 const cors = require("cors");
-const { rooms, addUserInRoom, deleteUserFromRoom } = require("./socket/user.js");
+const {
+  rooms,
+  addUserInRoom,
+  deleteUserFromRoom,
+  addNewMessageInRoom,
+} = require("./socket/rooms.js");
 
 const app = express();
 
@@ -17,18 +22,28 @@ const io = socketio(server, {
 app.use(cors());
 
 io.on("connection", (socket) => {
-  socket.on("joinRoom", ({ username, room }) => {
-    console.log("User join room");
-    addUserInRoom(username, room);
-    console.log(rooms);
+  socket.on("joinRoom", ({ username, roomname }) => {
+    addUserInRoom(username, roomname);
+    socket.join(roomname);
+    const { users, messages } = rooms.get(roomname);
+
+    io.sockets.to(roomname).emit("setUsers", { users });
+    io.sockets.to(roomname).emit("setMessages", { messages });
   });
 
-  socket.on("disconnect", () => {});
+  socket.on("sendMessage", ({ message, roomname }) => {
+    addNewMessageInRoom(message, roomname);
 
-  socket.on("userLogout", ({ username, room }) => {
-    console.log("LOGOUT");
-    deleteUserFromRoom(username, room);
-    console.log(rooms);
+    const { messages } = rooms.get(roomname);
+    io.sockets.to(roomname).emit("setMessages", { messages });
+  });
+
+  socket.on("userLogout", ({ username, roomname }) => {
+    deleteUserFromRoom(username, roomname);
+    const room = rooms.get(roomname);
+    if (room) {
+      io.sockets.to(roomname).emit("setUsers", { users: room.users });
+    }
   });
 });
 
